@@ -2,26 +2,26 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Import custom modules
 const connectDB = require('./config/db');
 
+// Initialize the Express application
 const app = express();
 
+// --- Connect to Database ---
 connectDB();
 
 // --- Middleware ---
 
-// The corrected, robust CORS configuration
-const corsOptions = {
-  origin: 'https://carnival-system-iktp.vercel.app', // <-- Corrected URL
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  optionsSuccessStatus: 204
-};
-app.options('*', cors(corsOptions)); // Handle pre-flight requests
-app.use(cors()); 
+// 1. CORS Security Configuration
+// This tells your backend to only accept requests from your live frontend URL.
+app.use(cors());
 
+// 2. Express JSON Parser: Allows the server to accept JSON in the request body.
 app.use(express.json());
 
 // --- Define API Routes ---
+// Connects your route files to the main application
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/transactions', require('./routes/transactions'));
