@@ -1,8 +1,7 @@
-import React, ahem, { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 1. Define the API_URL variable
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SubAdminDashboard = () => {
@@ -21,7 +20,6 @@ const SubAdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
-      // 2. Updated the API call
       const res = await axios.get(`${API_URL}/api/admin/search-students?search=${searchTerm}`, config);
       setSearchResults(res.data);
       if(res.data.length === 0) setMessage('No students found.');
@@ -40,7 +38,6 @@ const SubAdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { userId: selectedUser._id, amount: rechargeAmount };
-        // 2. Updated the API call
         const res = await axios.post(`${API_URL}/api/admin/recharge`, body, config);
         
         setMessage(`${res.data.msg}. New Balance: ${res.data.newBalance}`);
