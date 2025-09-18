@@ -10,15 +10,14 @@ connectDB();
 
 // --- Middleware ---
 
-// This is the new, more robust CORS configuration.
-// It explicitly handles the browser's preflight "OPTIONS" request.
+// The corrected, robust CORS configuration
 const corsOptions = {
-  origin: 'https://carnival-system-ikpt.vercel.app', // Corrected from your log, iktp -> ikpt
+  origin: 'https://carnival-system-iktp.vercel.app', // <-- Corrected URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   optionsSuccessStatus: 204
 };
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
-app.use(cors(corsOptions)); // Use CORS for all other requests
+app.options('*', cors(corsOptions)); // Handle pre-flight requests
+app.use(cors(corsOptions)); // Handle all other requests
 
 app.use(express.json());
 
