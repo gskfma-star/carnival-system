@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// 1. Define the API_URL variable for all API calls
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 // A simple reusable modal component
 const Modal = ({ children, onClose }) => (
   <div style={styles.modalBackdrop}>
@@ -45,7 +48,7 @@ const SuperAdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
-      const res = await axios.get(\${API_URL}/api/admin/users', config);
+      const res = await axios.get(`${API_URL}/api/admin/users`, config);
       setAllUsers(res.data);
     } catch (err) {
       setError('Failed to fetch users.');
@@ -56,7 +59,7 @@ const SuperAdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
-      const res = await axios.get('http://localhost:5000/api/admin/pending-requests', config);
+      const res = await axios.get(`${API_URL}/api/admin/pending-requests`, config);
       setPendingRequests(res.data);
     } catch (err) {
       setError('Failed to fetch pending requests.');
@@ -89,7 +92,7 @@ const SuperAdminDashboard = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       const body = { username: newUsername, email: newEmail, role: newRole };
-      const res = await axios.post('http://localhost:5000/api/admin/users', body, config);
+      const res = await axios.post(`${API_URL}/api/admin/users`, body, config);
       setSuccessMessage(`Successfully created user '${res.data.username}' and sent email.`);
       setNewUsername(''); setNewEmail(''); setNewRole('Student');
       fetchUsers();
@@ -103,7 +106,7 @@ const SuperAdminDashboard = () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
-        await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, config);
+        await axios.delete(`${API_URL}/api/admin/users/${userId}`, config);
         fetchUsers();
       } catch (err) {
         setError('Failed to delete user.');
@@ -118,7 +121,7 @@ const SuperAdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { userId: selectedUser._id, amount: adjustmentAmount };
-        await axios.post('http://localhost:5000/api/admin/wallet/adjust', body, config);
+        await axios.post(`${API_URL}/api/admin/wallet/adjust`, body, config);
         setSuccessMessage(`Balance adjusted for ${selectedUser.fullName}`);
         setModalContent(null);
         fetchUsers();
@@ -132,7 +135,7 @@ const SuperAdminDashboard = () => {
     try {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
-        const res = await axios.get(`http://localhost:5000/api/admin/transactions/${user._id}`, config);
+        const res = await axios.get(`${API_URL}/api/admin/transactions/${user._id}`, config);
         setUserTransactions(res.data);
         setModalContent('transactions');
     } catch (err) {
@@ -147,7 +150,7 @@ const SuperAdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { newPassword };
-        const res = await axios.put(`http://localhost:5000/api/admin/users/${selectedUser._id}/change-password`, body, config);
+        const res = await axios.put(`${API_URL}/api/admin/users/${selectedUser._id}/change-password`, body, config);
         setSuccessMessage(res.data.msg);
         setModalContent(null);
         setNewPassword('');
@@ -176,7 +179,7 @@ const SuperAdminDashboard = () => {
   const handleExportAll = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/admin/export/transactions', { headers: { 'x-auth-token': token }, responseType: 'blob' });
+      const res = await axios.get(`${API_URL}/api/admin/export/transactions`, { headers: { 'x-auth-token': token }, responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -192,7 +195,7 @@ const SuperAdminDashboard = () => {
   const handleExportUser = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/admin/export/transactions?userId=${userId}`, { headers: { 'x-auth-token': token }, responseType: 'blob' });
+      const res = await axios.get(`${API_URL}/api/admin/export/transactions?userId=${userId}`, { headers: { 'x-auth-token': token }, responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -210,7 +213,7 @@ const SuperAdminDashboard = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       const body = { action };
-      await axios.post(`http://localhost:5000/api/admin/resolve-request/${requestId}`, body, config);
+      await axios.post(`${API_URL}/api/admin/resolve-request/${requestId}`, body, config);
       fetchUsers();
       fetchPendingRequests();
     } catch (err) {

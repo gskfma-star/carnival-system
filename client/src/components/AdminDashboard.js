@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// A simple reusable modal component
+// 1. Define the API_URL variable for all API calls
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const Modal = ({ children, onClose }) => (
   <div style={styles.modalBackdrop}>
     <div style={styles.modalContent}>
@@ -13,34 +15,25 @@ const Modal = ({ children, onClose }) => (
 );
 
 const AdminDashboard = () => {
-  // --- STATE MANAGEMENT ---
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  
-  // State for creating students
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
-
-  // State for filtering
   const [searchTerm, setSearchTerm] = useState('');
-
-  // State for the recharge modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rechargeAmount, setRechargeAmount] = useState('');
-
   const navigate = useNavigate();
-
-  // --- API & EVENT HANDLERS ---
 
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
-      const res = await axios.get(\${API_URL}/api/admin/view-users', config);
+      // 2. Corrected the path to use the API_URL variable
+      const res = await axios.get(`${API_URL}/api/admin/view-users`, config);
       setUsers(res.data);
     } catch (err) {
       setError('Failed to fetch users.');
@@ -73,7 +66,8 @@ const AdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { username: newUsername, email: newEmail, role: 'Student' };
-        const res = await axios.post('http://localhost:5000/api/admin/users', body, config);
+        // 3. Updated the path to use the API_URL variable
+        const res = await axios.post(`${API_URL}/api/admin/users`, body, config);
         setSuccessMessage(`Successfully created student '${res.data.username}' and sent an email.`);
         setNewUsername(''); setNewEmail('');
         fetchUsers();
@@ -93,7 +87,8 @@ const AdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { userId: selectedUser._id, amount: rechargeAmount };
-        const res = await axios.post('http://localhost:5000/api/admin/recharge', body, config);
+        // 3. Updated the path to use the API_URL variable
+        const res = await axios.post(`${API_URL}/api/admin/recharge`, body, config);
         setSuccessMessage(res.data.msg);
         setIsModalOpen(false);
         fetchUsers();
@@ -115,7 +110,6 @@ const AdminDashboard = () => {
 
   if (isLoading) return <div style={styles.container}><p>Loading...</p></div>;
 
-  // --- JSX RENDER ---
   return (
     <div style={styles.container}>
       {isModalOpen && (
@@ -127,15 +121,12 @@ const AdminDashboard = () => {
               </form>
           </Modal>
       )}
-
       <div style={styles.header}>
         <h1>Admin Dashboard</h1>
         <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
       </div>
-      
       {error && <p style={{color: 'red', textAlign: 'center'}}>{error}</p>}
       {successMessage && <p style={{color: 'green', textAlign: 'center'}}>{successMessage}</p>}
-      
       <div style={styles.formContainer}>
         <h3>Create New Student</h3>
         <p>A password will be auto-generated and emailed to the student.</p>
@@ -145,11 +136,9 @@ const AdminDashboard = () => {
           <button type="submit" style={styles.button}>Create Student</button>
         </form>
       </div>
-
       <div style={styles.filters}>
         <input type="text" placeholder="Search by name, username, or email..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={styles.searchInput}/>
       </div>
-
       <div style={styles.tableContainer}>
         <h3>Students & Vendors ({filteredUsers.length})</h3>
         <table style={styles.table}>
@@ -171,7 +160,6 @@ const AdminDashboard = () => {
   );
 };
 
-// --- STYLES ---
 const styles = {
     container: { padding: '2rem', fontFamily: 'Arial, sans-serif' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' },
@@ -190,5 +178,4 @@ const styles = {
     input: { display: 'block', width: '100%', padding: '8px', marginBottom: '10px', boxSizing: 'border-box' },
     button: { padding: '10px 15px', border: 'none', backgroundColor: '#007bff', color: 'white', borderRadius: '4px', cursor: 'pointer' },
 };
-
 export default AdminDashboard;

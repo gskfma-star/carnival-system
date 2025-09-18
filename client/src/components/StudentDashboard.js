@@ -3,6 +3,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// 1. Define the API_URL variable
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const StudentDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -25,9 +28,10 @@ const StudentDashboard = () => {
           return;
         }
         const config = { headers: { 'x-auth-token': token } };
+        // 2. Updated both API calls to use the API_URL
         const [userResponse, transactionsResponse] = await Promise.all([
-          axios.get(\${API_URL}/api/users/me', config),
-          axios.get('http://localhost:5000/api/transactions/history', config),
+          axios.get(`${API_URL}/api/users/me`, config),
+          axios.get(`${API_URL}/api/transactions/history`, config),
         ]);
         setUserData(userResponse.data);
         setTransactions(transactionsResponse.data);

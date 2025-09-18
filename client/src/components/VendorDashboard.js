@@ -1,52 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // <-- 1. Import useNavigate
+import { useNavigate } from 'react-router-dom';
+
+// 1. Define the API_URL variable
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const VendorDashboard = () => {
   const [studentId, setStudentId] = useState('');
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // <-- 2. Initialize useNavigate
+  const navigate = useNavigate();
 
-  // Logout function
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
 
   useEffect(() => {
-    // This effect should only run when the scanner needs to be shown
     if (!studentId) {
       const scanner = new Html5QrcodeScanner(
         'qr-reader',
         { qrbox: { width: 250, height: 250 }, fps: 5 },
         false
       );
-
       const onScanSuccess = (decodedText) => {
         setStudentId(decodedText);
         setMessage('');
         scanner.clear();
       };
-
-      const onScanError = (errorMessage) => {
-        // This can be noisy, so we'll just log it for now
-        // console.warn(errorMessage);
-      };
-
+      const onScanError = (errorMessage) => { /* console.warn(errorMessage); */ };
       scanner.render(onScanSuccess, onScanError);
-
-      // Cleanup function to stop the scanner when the component unmounts or updates
       return () => {
-        // Check if scanner is still active before clearing
-        if (scanner && scanner.getState() === 2) { // 2 is SCANNING state
+        if (scanner && scanner.getState() === 2) {
              scanner.clear().catch(error => console.error("Failed to clear scanner:", error));
         }
       };
     }
-  }, [studentId]); // Rerun effect if studentId changes (e.g., after a transaction)
+  }, [studentId]);
 
   const handleCharge = async (e) => {
     e.preventDefault();
@@ -57,7 +49,8 @@ const VendorDashboard = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       const body = { studentId, amount: Number(amount) };
-      const response = await axios.post(\${API_URL}/api/transactions/charge', body, config);
+      // 2. Corrected the API call
+      const response = await axios.post(`${API_URL}/api/transactions/charge`, body, config);
       setMessage(`Success! Charged ${amount} tokens. Student's new balance: ${response.data.newBalance}`);
       setStudentId('');
       setAmount('');
@@ -69,7 +62,6 @@ const VendorDashboard = () => {
     }
   };
 
-  // A function to reset the state and show the scanner again
   const handleScanAgain = () => {
       setStudentId('');
       setMessage('');
@@ -80,7 +72,7 @@ const VendorDashboard = () => {
     <div style={styles.container}>
       <div style={styles.header}>
         <h1>Vendor Dashboard</h1>
-        <button onClick={handleLogout} style={styles.logoutButton}>Logout</button> {/* <-- 3. Add the button */}
+        <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
       </div>
       
       {!studentId ? (
@@ -115,8 +107,6 @@ const VendorDashboard = () => {
   );
 };
 
-
-// --- Basic Styling ---
 const styles = {
     container: { padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' },

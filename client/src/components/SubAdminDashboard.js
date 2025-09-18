@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, ahem, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+// 1. Define the API_URL variable
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SubAdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +21,8 @@ const SubAdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
-      const res = await axios.get(\${API_URL}/api/admin/search-students?search=${searchTerm}`, config);
+      // 2. Updated the API call
+      const res = await axios.get(`${API_URL}/api/admin/search-students?search=${searchTerm}`, config);
       setSearchResults(res.data);
       if(res.data.length === 0) setMessage('No students found.');
     } catch (err) {
@@ -36,10 +40,10 @@ const SubAdminDashboard = () => {
         const token = localStorage.getItem('token');
         const config = { headers: { 'x-auth-token': token } };
         const body = { userId: selectedUser._id, amount: rechargeAmount };
-        const res = await axios.post('http://localhost:5000/api/admin/recharge', body, config);
+        // 2. Updated the API call
+        const res = await axios.post(`${API_URL}/api/admin/recharge`, body, config);
         
         setMessage(`${res.data.msg}. New Balance: ${res.data.newBalance}`);
-        // Reset the form
         setSelectedUser(null);
         setSearchTerm('');
         setSearchResults([]);
@@ -107,7 +111,6 @@ const SubAdminDashboard = () => {
   );
 };
 
-// --- STYLES ---
 const styles = {
     container: { maxWidth: '700px', margin: '2rem auto', padding: '2rem', fontFamily: 'Arial, sans-serif', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', borderRadius: '8px', backgroundColor: '#fff' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '1rem' },
@@ -117,7 +120,7 @@ const styles = {
     button: { padding: '12px 15px', border: 'none', backgroundColor: '#007bff', color: 'white', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem' },
     cancelButton: { backgroundColor: '#6c757d', marginTop: '10px' },
     results: { marginTop: '1rem' },
-    resultItem: { padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', marginBottom: '5px', ':hover': { backgroundColor: '#f9f9f9' } }
+    resultItem: { padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', marginBottom: '5px' }
 };
 
 export default SubAdminDashboard;
