@@ -13,9 +13,16 @@ connectDB();
 
 // --- Middleware ---
 
-// 1. CORS Security Configuration
-// This tells your backend to only accept requests from your live frontend URL.
-app.use(cors());
+// 1. Final, Secure CORS Configuration
+// This explicitly handles the browser's pre-flight "OPTIONS" request
+// and allows requests only from your specific Vercel URL.
+const corsOptions = {
+  origin: 'https://carnival-system-iktp.vercel.app',
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 204
+};
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+app.use(cors(corsOptions)); // Use CORS for all other requests
 
 // 2. Express JSON Parser: Allows the server to accept JSON in the request body.
 app.use(express.json());
